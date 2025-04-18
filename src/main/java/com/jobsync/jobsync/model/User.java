@@ -37,6 +37,11 @@ public class User {
     @Column(unique=true, nullable=false)
     private String email;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
+    private List<String> roles;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<JobApplication> jobApplications;
 
@@ -47,10 +52,11 @@ public class User {
     private static final ULID ulidGenerator = new ULID();
 
     public User() {}
-    public User(String username, String password, String email) {
+    public User(String username, String password, String email, List<String> roles) {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.roles = roles;
     }
 
     @PrePersist
@@ -69,6 +75,8 @@ public class User {
     public void setPassword(String password) { this.password = password; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+    public List<String> getRoles() { return  roles; }
+    public void setRoles(List<String> roles) { this.roles = roles; }
     public List<JobApplication> getJobApplications() { return jobApplications; }
     public void setJobApplications(List<JobApplication> jobApplications) { this.jobApplications = jobApplications; }
     public List<TechnicalNote> getTechnicalNotes() { return technicalNotes; }

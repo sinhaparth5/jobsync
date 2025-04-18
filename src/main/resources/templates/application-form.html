@@ -1,47 +1,60 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Add Job Application</title>
+    <title th:text="${application.id} ? 'Edit Job Application' : 'Add Job Application'"></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; }
-        input, select { width: 300px; padding: 8px; }
-        .error { color: red; }
-        button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        .form-container { max-width: 500px; margin: 40px auto; }
+        .error-list { color: red; margin-bottom: 15px; }
     </style>
 </head>
 <body>
-<h1>Add Job Application</h1>
-<form th:action="@{/applications}" th:object="${application}" method="post">
-    <div class="form-group">
-        <label for="company">Company</label>
-        <input type="text" id="company" th:field="*{company}" />
-        <span class="error" th:if="${#fields.hasErrors('company')}" th:errors="*{company}"></span>
-    </div>
-    <div class="form-group">
-        <label for="role">Role</label>
-        <input type="text" id="role" th:field="*{role}" />
-        <span class="error" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></span>
-    </div>
-    <div class="form-group">
-        <label for="status">Status</label>
-        <select id="status" th:field="*{status}">
-            <option value="">Select Status</option>
-            <option value="Applied">Applied</option>
-            <option value="Interviewing">Interviewing</option>
-            <option value="Offer">Offer</option>
-            <option value="Rejected">Rejected</option>
-        </select>
-        <span class="error" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></span>
-    </div>
-    <div class="form-group">
-        <label for="deadline">Deadline</label>
-        <input type="date" id="deadline" th:field="*{deadline}" />
-        <span class="error" th:if="${#fields.hasErrors('deadline')}" th:errors="*{deadline}"></span>
-    </div>
-    <button type="submit">Save</button>
-</form>
-<a href="/dashboard">Back to Dashboard</a>
+<div class="container form-container">
+    <h1 th:text="${application.id} ? 'Edit Job Application' : 'Add Job Application'"></h1>
+    <form th:action="${application.id} ? @{/applications/edit(id=${application.id})} : @{/applications}" th:object="${application}" method="post" enctype="multipart/form-data">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <div class="error-list" th:if="${#fields.hasErrors('*')}">
+            <ul>
+                <li th:each="error : ${#fields.errors('*')}" th:text="${error}"></li>
+            </ul>
+        </div>
+        <div class="mb-3">
+            <label for="company" class="form-label">Company</label>
+            <input type="text" id="company" th:field="*{company}" class="form-control" />
+            <div class="text-danger" th:if="${#fields.hasErrors('company')}" th:errors="*{company}"></div>
+        </div>
+        <div class="mb-3">
+            <label for="role" class="form-label">Role</label>
+            <input type="text" id="role" th:field="*{role}" class="form-control" />
+            <div class="text-danger" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></div>
+        </div>
+        <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+            <select id="status" th:field="*{status}" class="form-select">
+                <option value="">Select Status</option>
+                <option value="Applied">Applied</option>
+                <option value="Interviewing">Interviewing</option>
+                <option value="Offer">Offer</option>
+                <option value="Rejected">Rejected</option>
+            </select>
+            <div class="text-danger" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></div>
+        </div>
+        <div class="mb-3">
+            <label for="deadline" class="form-label">Deadline</label>
+            <input type="date" id="deadline" th:field="*{deadline}" class="form-control" />
+            <div class="text-danger" th:if="${#fields.hasErrors('deadline')}" th:errors="*{deadline}"></div>
+        </div>
+        <div class="mb-3">
+            <label for="resume" class="form-label">Resume (PDF)</label>
+            <input type="file" id="resume" name="resume" class="form-control" accept=".pdf" />
+            <div th:if="${application.resumePath}" class="form-text">
+                Current file: <a th:href="@{'/uploads/resumes/' + ${application.resumePath}}" target="_blank" th:text="${application.resumePath}"></a>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="/dashboard" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

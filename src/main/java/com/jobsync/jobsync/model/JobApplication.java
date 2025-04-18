@@ -39,6 +39,9 @@ public class JobApplication {
     @Column(name = "deadline")
     private LocalDate deadline;
 
+    @Column(name = "resume_path")
+    private String resumePath;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -47,11 +50,12 @@ public class JobApplication {
     private static final ULID ulidGenerator = new ULID();
 
     public JobApplication() {}
-    public JobApplication(String company, String role, String status, LocalDate deadline, User user) {
+    public JobApplication(String company, String role, String status, LocalDate deadline, String resumePath, User user) {
         this.company = company;
         this.role = role;
         this.status = status;
         this.deadline = deadline;
+        this.resumePath = resumePath;
         this.user = user;
     }
 
@@ -73,6 +77,8 @@ public class JobApplication {
     public void setStatus(String status) { this.status = status; }
     public LocalDate getDeadline() { return deadline; }
     public void setDeadline(LocalDate deadline) { this.deadline = deadline; }
+    public String getResumePath() { return resumePath; }
+    public void setResumePath(String resumePath) { this.resumePath = resumePath; }
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
 }
