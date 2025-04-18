@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>JobSync Dashboard</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin: 20px auto;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>JobSync Dashboard</h1>
+    <table>
+        <tr>
+            <th>Company</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Deadline</th>
+        </tr>
+        <tr th:each="app : ${applications}">
+            <td th:text="${app.company}"></td>
+            <td th:text="${app.role}"></td>
+            <td th:text="${app.status}"></td>
+            <td th:text="${app.deadline}"></td>
+        </tr>
+    </table>
+</body>
+</html>

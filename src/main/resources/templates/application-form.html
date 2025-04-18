@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Job Application</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input, select { width: 300px; padding: 8px; }
+        .error { color: red; }
+        button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+<h1>Add Job Application</h1>
+<form th:action="@{/applications}" th:object="${application}" method="post">
+    <div class="form-group">
+        <label for="company">Company</label>
+        <input type="text" id="company" th:field="*{company}" />
+        <span class="error" th:if="${#fields.hasErrors('company')}" th:errors="*{company}"></span>
+    </div>
+    <div class="form-group">
+        <label for="role">Role</label>
+        <input type="text" id="role" th:field="*{role}" />
+        <span class="error" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></span>
+    </div>
+    <div class="form-group">
+        <label for="status">Status</label>
+        <select id="status" th:field="*{status}">
+            <option value="">Select Status</option>
+            <option value="Applied">Applied</option>
+            <option value="Interviewing">Interviewing</option>
+            <option value="Offer">Offer</option>
+            <option value="Rejected">Rejected</option>
+        </select>
+        <span class="error" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></span>
+    </div>
+    <div class="form-group">
+        <label for="deadline">Deadline</label>
+        <input type="date" id="deadline" th:field="*{deadline}" />
+        <span class="error" th:if="${#fields.hasErrors('deadline')}" th:errors="*{deadline}"></span>
+    </div>
+    <button type="submit">Save</button>
+</form>
+<a href="/dashboard">Back to Dashboard</a>
+</body>
+</html>

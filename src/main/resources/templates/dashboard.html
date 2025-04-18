@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>JobSync Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        table { border-collapse: collapse; width: 80%; margin: 20px auto; }
+        th, td { border: 1px solid black; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .nav-buttons { margin-bottom: 20px; text-align: center; }
+        .nav-buttons a, .nav-buttons span {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 0 10px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .nav-buttons a:hover { background-color: #45a049; }
+        .section { margin-top: 40px; }
+    </style>
+</head>
+<body>
+<h1>JobSync Dashboard</h1>
+<div class="nav-buttons">
+    <span sec:authorize="isAuthenticated()" th:text="'Welcome, ' + ${#authentication.getName()}"></span>
+    <a sec:authorize="!isAuthenticated()" href="/login">Login</a>
+    <a href="/register">Register</a>
+    <a href="/applications/new">Add Job Application</a>
+    <a href="/notes/new">Add Technical Note</a>
+</div>
+
+<div class="section">
+    <h2>Job Applications</h2>
+    <table>
+        <tr>
+            <th>Company</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Deadline</th>
+        </tr>
+        <tr th:each="app : ${applications}">
+            <td th:text="${app.company}"></td>
+            <td th:text="${app.role}"></td>
+            <td th:text="${app.status}"></td>
+            <td th:text="${app.deadline}"></td>
+        </tr>
+    </table>
+</div>
+
+<div class="section">
+    <h2>Technical Notes</h2>
+    <table>
+        <tr>
+            <th>Topic</th>
+            <th>Content</th>
+            <th>Category</th>
+        </tr>
+        <tr th:each="note : ${notes}">
+            <td th:text="${note.topic}"></td>
+            <td th:text="${note.content}"></td>
+            <td th:text="${note.category} ?: 'None'"></td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

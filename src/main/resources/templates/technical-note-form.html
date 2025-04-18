@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Technical Note</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input, textarea { width: 300px; padding: 8px; }
+        textarea { height: 100px; }
+        .error { color: red; }
+        button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+<h1>Add Technical Note</h1>
+<form th:action="@{/notes}" th:object="${note}" method="post">
+    <div class="form-group">
+        <label for="topic">Topic</label>
+        <input type="text" id="topic" th:field="*{topic}" />
+        <span class="error" th:if="${#fields.hasErrors('topic')}" th:errors="*{topic}"></span>
+    </div>
+    <div class="form-group">
+        <label for="content">Content</label>
+        <textarea id="content" th:field="*{content}"></textarea>
+        <span class="error" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></span>
+    </div>
+    <div class="form-group">
+        <label for="category">Category</label>
+        <input type="text" id="category" th:field="*{category}" />
+        <span class="error" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></span>
+    </div>
+    <button type="submit">Save</button>
+</form>
+<a href="/dashboard">Back to Dashboard</a>
+</body>
+</html>
