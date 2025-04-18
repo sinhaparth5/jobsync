@@ -9,12 +9,15 @@ import com.jobsync.jobsync.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 
 /**
@@ -23,12 +26,22 @@ import org.springframework.security.web.header.writers.frameoptions.XFrameOption
  */
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
+    private final JwtRequestFilter jwtRequestFilter;
+
+    public SecurityConfig(JwtRequestFilter jwtRequestFilter) {
+        this.jwtRequestFilter = jwtRequestFilter;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/dashboard", "/h2-console/**", "/login", "/register", "/applications/**").permitAll()
+                            .requestMatchers("/login", "/register", "/h2-console/**", "/error", "/api/auth/**").permitAll()
+                            .requestMatchers("/dashboard", "/applications/**", "/notes/**").hasAnyRole("USER", "ADMIN")
+                            .requestMatchers("/admin/**").hasRole("ADMIN")
+                            .requestMatchers("/api/applications/**").hasAnyRole("USER", "ADMIN")
                 .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -41,7 +54,8 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login?logout")
                         .permitAll()
                 )
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/register", "/applications"))
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/register", "/api/**"))
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .headers(headers -> headers
                     .addHeaderWriter(new XFrameOptionsHeaderWriter(
                         XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
@@ -53,11 +67,13 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
         return username -> userRepository.findByUsername(username)
-                .map(user -> org.springframework.security.core.userdetails.User
-                        .withUsername(user.getUsername())
-                        .password(user.getPassword())
-                        .roles("USER")
-                        .build())
+                .map(user -> new org.springframework.security.core.userdetails.User(
+                        user.getUsername(),
+                        user.getPassword(),
+                        user.getRoles().stream()
+                                .map(SimpleGrantedAuthority::new)
+                                .toList()
+                ))
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
