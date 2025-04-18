@@ -1,68 +1,135 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="en">
 <head>
     <title>JobSync Dashboard</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.5/css/bootstrap.min.css}" />
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; }
-        table { border-collapse: collapse; width: 80%; margin: 20px auto; }
-        th, td { border: 1px solid black; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .nav-buttons { margin-bottom: 20px; text-align: center; }
-        .nav-buttons a, .nav-buttons span {
-            display: inline-block;
-            padding: 10px 20px;
-            margin: 0 10px;
-            background-color: #4CAF50;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-        }
-        .nav-buttons a:hover { background-color: #45a049; }
         .section { margin-top: 40px; }
+        .pagination { justify-content: center; }
+        .search-form { max-width: 600px; margin: 20px auto; }
+        .action-buttons { white-space: nowrap; }
     </style>
 </head>
 <body>
-<h1>JobSync Dashboard</h1>
-<div class="nav-buttons">
-    <span sec:authorize="isAuthenticated()" th:text="'Welcome, ' + ${#authentication.getName()}"></span>
-    <a sec:authorize="!isAuthenticated()" href="/login">Login</a>
-    <a href="/register">Register</a>
-    <a href="/applications/new">Add Job Application</a>
-    <a href="/notes/new">Add Technical Note</a>
-</div>
+<div class="container">
+    <h1 class="text-center">JobSync Dashboard</h1>
+    <div class="d-flex justify-content-center gap-2 mb-4">
+        <span sec:authorize="isAuthenticated()" class="btn btn-success" th:text="'Welcome, ' + ${#authentication.getName()}"></span>
+        <a sec:authorize="!isAuthenticated()" href="/login" class="btn btn-success">Login</a>
+        <a href="/register" class="btn btn-success">Register</a>
+        <a href="/applications/new" class="btn btn-success">Add Job Application</a>
+        <a href="/notes/new" class="btn btn-success">Add Technical Note</a>
+    </div>
 
-<div class="section">
-    <h2>Job Applications</h2>
-    <table>
-        <tr>
-            <th>Company</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th>Deadline</th>
-        </tr>
-        <tr th:each="app : ${applications}">
-            <td th:text="${app.company}"></td>
-            <td th:text="${app.role}"></td>
-            <td th:text="${app.status}"></td>
-            <td th:text="${app.deadline}"></td>
-        </tr>
-    </table>
-</div>
+    <!-- Job Applications -->
+    <div class="section">
+        <h2>Job Applications</h2>
+        <form th:action="@{/dashboard}" method="get" class="search-form">
+            <div class="input-group mb-3">
+                <input type="text" name="appSearch" class="form-control" th:value="${appSearch}" placeholder="Search by company or role" />
+                <select name="appStatus" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="Applied" th:selected="${appStatus == 'Applied'}">Applied</option>
+                    <option value="Interviewing" th:selected="${appStatus == 'Interviewing'}">Interviewing</option>
+                    <option value="Offer" th:selected="${appStatus == 'Offer'}">Offer</option>
+                    <option value="Rejected" th:selected="${appStatus == 'Rejected'}">Rejected</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+            <input type="hidden" name="appPage" value="0" />
+            <input type="hidden" name="notePage" th:value="${notePage.number}" />
+            <input type="hidden" name="noteSearch" th:value="${noteSearch}" />
+            <input type="hidden" name="noteCategory" th:value="${noteCategory}" />
+        </form>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Company</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Deadline</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="app : ${applications}">
+                <td th:text="${app.company}"></td>
+                <td th:text="${app.role}"></td>
+                <td th:text="${app.status}"></td>
+                <td th:text="${app.deadline}"></td>
+                <td class="action-buttons">
+                    <a th:href="@{/applications/edit(id=${app.id})}" class="btn btn-sm btn-warning">Edit</a>
+                    <a th:href="@{/applications/delete(id=${app.id})}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this application?')">Delete</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <nav th:if="${appPage.totalPages > 1}">
+            <ul class="pagination">
+                <li class="page-item" th:classappend="${appPage.hasPrevious() ? '' : 'disabled'}">
+                    <a class="page-link" th:href="@{/dashboard(appPage=${appPage.number - 1},notePage=${notePage.number},appSearch=${appSearch},appStatus=${appStatus},noteSearch=${noteSearch},noteCategory=${noteCategory})}">Previous</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, appPage.totalPages - 1)}" th:classappend="${i == appPage.number ? 'active' : ''}">
+                    <a class="page-link" th:href="@{/dashboard(appPage=${i},notePage=${notePage.number},appSearch=${appSearch},appStatus=${appStatus},noteSearch=${noteSearch},noteCategory=${noteCategory})}" th:text="${i + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${appPage.hasNext() ? '' : 'disabled'}">
+                    <a class="page-link" th:href="@{/dashboard(appPage=${appPage.number + 1},notePage=${notePage.number},appSearch=${appSearch},appStatus=${appStatus},noteSearch=${noteSearch},noteCategory=${noteCategory})}">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 
-<div class="section">
-    <h2>Technical Notes</h2>
-    <table>
-        <tr>
-            <th>Topic</th>
-            <th>Content</th>
-            <th>Category</th>
-        </tr>
-        <tr th:each="note : ${notes}">
-            <td th:text="${note.topic}"></td>
-            <td th:text="${note.content}"></td>
-            <td th:text="${note.category} ?: 'None'"></td>
-        </tr>
-    </table>
+    <!-- Technical Notes -->
+    <div class="section">
+        <h2>Technical Notes</h2>
+        <form th:action="@{/dashboard}" method="get" class="search-form">
+            <div class="input-group mb-3">
+                <input type="text" name="noteSearch" class="form-control" th:value="${noteSearch}" placeholder="Search by topic or category" />
+                <input type="text" name="noteCategory" class="form-control" th:value="${noteCategory}" placeholder="Filter by category" />
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+            <input type="hidden" name="notePage" value="0" />
+            <input type="hidden" name="appPage" th:value="${appPage.number}" />
+            <input type="hidden" name="appSearch" th:value="${appSearch}" />
+            <input type="hidden" name="appStatus" th:value="${appStatus}" />
+        </form>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Topic</th>
+                <th>Content</th>
+                <th>Category</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="note : ${notes}">
+                <td th:text="${note.topic}"></td>
+                <td th:text="${note.content}"></td>
+                <td th:text="${note.category} ?: 'None'"></td>
+                <td class="action-buttons">
+                    <a th:href="@{/notes/edit(id=${note.id})}" class="btn btn-sm btn-warning">Edit</a>
+                    <a th:href="@{/notes/delete(id=${note.id})}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this note?')">Delete</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <nav th:if="${notePage.totalPages > 1}">
+            <ul class="pagination">
+                <li class="page-item" th:classappend="${notePage.hasPrevious() ? '' : 'disabled'}">
+                    <a class="page-link" th:href="@{/dashboard(notePage=${notePage.number - 1},appPage=${appPage.number},appSearch=${appSearch},appStatus=${appStatus},noteSearch=${noteSearch},noteCategory=${noteCategory})}">Previous</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, notePage.totalPages - 1)}" th:classappend="${i == notePage.number ? 'active' : ''}">
+                    <a class="page-link" th:href="@{/dashboard(notePage=${i},appPage=${appPage.number},appSearch=${appSearch},appStatus=${appStatus},noteSearch=${noteSearch},noteCategory=${noteCategory})}" th:text="${i + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${notePage.hasNext() ? '' : 'disabled'}">
+                    <a class="page-link" th:href="@{/dashboard(notePage=${notePage.number + 1},appPage=${appPage.number},appSearch=${appSearch},appStatus=${appStatus},noteSearch=${noteSearch},noteCategory=${noteCategory})}">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 </div>
+<script th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.bundle.min.js}"></script>
 </body>
 </html>
