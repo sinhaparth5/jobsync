@@ -18,6 +18,7 @@
         <span sec:authorize="isAuthenticated()" class="btn btn-success" th:text="'Welcome, ' + ${#authentication.getName()}"></span>
         <a sec:authorize="!isAuthenticated()" href="/login" class="btn btn-success">Login</a>
         <a href="/register" class="btn btn-success">Register</a>
+        <a href="/analytics" class="btn btn-success">Analytics</a>
         <a href="/applications/new" class="btn btn-success">Add Job Application</a>
         <a href="/notes/new" class="btn btn-success">Add Technical Note</a>
         <a sec:authorize="hasRole('ADMIN')" href="/admin/dashboard" class="btn btn-success">Admin Dashboard</a>

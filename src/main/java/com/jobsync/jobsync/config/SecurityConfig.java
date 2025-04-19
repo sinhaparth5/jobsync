@@ -39,7 +39,7 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                             .requestMatchers("/login", "/register", "/h2-console/**", "/error", "/api/auth/**").permitAll()
-                            .requestMatchers("/dashboard", "/applications/**", "/notes/**").hasAnyRole("USER", "ADMIN")
+                            .requestMatchers("/dashboard", "/applications/**", "/notes/**", "/analytics").hasAnyRole("USER", "ADMIN")
                             .requestMatchers("/admin/**").hasRole("ADMIN")
                             .requestMatchers("/api/applications/**").hasAnyRole("USER", "ADMIN")
                 .anyRequest().authenticated()
