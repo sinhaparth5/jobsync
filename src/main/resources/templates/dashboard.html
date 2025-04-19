@@ -30,14 +30,18 @@
         <h2>Job Applications</h2>
         <form th:action="@{/dashboard}" method="get" class="search-form">
             <div class="input-group mb-3">
-                <input type="text" name="appSearch" class="form-control" th:value="${appSearch}" placeholder="Search by company or role" />
-                <select name="appStatus" class="form-select">
-                    <option value="">All Statuses</option>
-                    <option value="Applied" th:selected="${appStatus == 'Applied'}">Applied</option>
-                    <option value="Interviewing" th:selected="${appStatus == 'Interviewing'}">Interviewing</option>
-                    <option value="Offer" th:selected="${appStatus == 'Offer'}">Offer</option>
-                    <option value="Rejected" th:selected="${appStatus == 'Rejected'}">Rejected</option>
-                </select>
+                <label>
+                    <input type="text" name="appSearch" class="form-control" th:value="${appSearch}" placeholder="Search by company or role" />
+                </label>
+                <label>
+                    <select name="appStatus" class="form-select">
+                        <option value="">All Statuses</option>
+                        <option value="Applied" th:selected="${appStatus == 'Applied'}">Applied</option>
+                        <option value="Interviewing" th:selected="${appStatus == 'Interviewing'}">Interviewing</option>
+                        <option value="Offer" th:selected="${appStatus == 'Offer'}">Offer</option>
+                        <option value="Rejected" th:selected="${appStatus == 'Rejected'}">Rejected</option>
+                    </select>
+                </label>
                 <button type="submit" class="btn btn-primary">Search</button>
             </div>
             <input type="hidden" name="appPage" value="0" />
